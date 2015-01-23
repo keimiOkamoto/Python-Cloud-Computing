@@ -1,0 +1,40 @@
+class PairsProbability(MRJob):
+
+	paragraph = ""
+
+	def Mapper(self, _, line):
+		print line + " <<<<<<<< " + str(len(line))
+		global next		
+		
+		if line.split() != "" :
+			words = list(re.findall(re.compile('\w+'), line))line.lower
+			paragraph += words #A paragraph is made. Next for the pairs..
+				
+			
+			for element in range(len(paragraph)): #iterate for the length of the paragraph
+				if element == 'for':
+				#if next word is a blank line ignore pair
+				print paragraph[element, element+1, 1]
+				yield paragraph[element,element+1, 1]
+		
+			# combiner optimization requiored 
+
+		paragraph = "" #Reset variable for next paragraph
+
+
+
+	def Reducer(self, word, count): #out key value
+		yield (word, sum(count))
+		
+			
+	def steps(self):
+		return [
+			self.mr(mapper=self.mapper,
+				combiner=self.combiner,
+				reducer=self.reducer),
+			self.mr(reducer=self.thetop)
+		]
+			
+		
+if __name__ == '__main__':
+	PairsProbability.run()

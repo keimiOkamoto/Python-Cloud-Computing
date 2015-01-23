@@ -1,0 +1,94 @@
+from mrjob.job import MRJob
+import re
+#import heapq
+
+WORD_RE = re.compile(r"[\w']+")
+
+class PairsProbability(MRJob):
+
+	last_word = ""
+	pair=[]
+	
+	def mapper(self, _, line):
+		words = re.compile(r"[\w']+").findall(line)
+		
+		if words:
+			if self.last_word:
+				pair = self.last_word, words[0]
+				print pair
+				yield [pair, 1]
+			
+			for element in range(len(words)): 
+				if element != len(words)-1:
+					pair = words[element], words[element+1]
+					print pair
+					yield [pair, 1]
+			
+			self.last_word = words[len(words)-1]
+		else:
+			self.last_word = ""
+		
+		
+		
+				
+		
+		'''
+		if(line.strip() != ""):
+			words = WORD_RE.findall(line)
+			for idx, val in enumerate(words):
+				yield(words[idx].lower(),("*",1))
+				if (idx < len(words) -1):
+					print words[idx].lower()
+					print words[idx+1].lower()
+					print "______________________________"
+					yield (words[idx].lower(), (words[idx+1].lower(), 1))
+		
+		
+		if line.strip() !="":
+			self,paragraph == line + "\n"
+		else:
+			words = re.compile(r"[\w']+").findall(self.paragraph)
+			for index, word in enumerate(words):
+				yield(words[index].lower(), ("*", 1))
+				if index < len(words)-1:
+					yield (words[index].lower(), (words[index+1].lower(),1)
+			
+			#self.paragraph = ""
+		
+		print "Read Line: " + line + " <<<<<<<< " + str(len(line))	
+		
+		if line.strip() != "":
+			words = list(re.findall(re.compile('\w+'), line.lower()))
+			self.paragraph += words
+		else:
+			print self.paragraph
+
+			
+			for element in range(len(self.paragraph)): 
+				if self.paragraph[element] == 'for':
+					print "PASSSSSSSSSSSSSSSSSSSSSS"
+					#if self.paragraph.index(element) != range(len(self.paragraph))-1:
+					pair = self.paragraph[element], self.paragraph[element+1]
+					print pair
+					yield [pair, 1]
+		
+			# combiner optimization requiored 
+
+		paragraph = ""
+		'''
+		
+	def reducer(self, word, count): #out key value
+		yield (word, sum(count))
+		
+			
+	def steps(self):
+		return [
+			self.mr(mapper=self.mapper,
+				#combiner=self.combiner,
+				reducer=self.reducer),
+			#self.mr(reducer=self.thetop)
+		]
+			
+		
+if __name__ == '__main__':
+	PairsProbability.run()
